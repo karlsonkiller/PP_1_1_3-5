@@ -19,13 +19,14 @@ public class User {
     private Byte age;
 
 
-    public User(int id,String name, String lastName, Byte age) {
-        this.id = (long) id;
+    public User(String name, String lastName, Byte age) {
         this.name = name;
         this.lastName = lastName;
         this.age = age;
     }
 
+    public User() {
+    }
 
     @Override
     public String toString() {

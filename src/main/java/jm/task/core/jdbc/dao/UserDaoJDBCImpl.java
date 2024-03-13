@@ -12,8 +12,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
     private static final Connection connection = Util.getConnection();
 
-
-    private static final String SAVE = "INSERT INTO users (name, lastname, age) VALUES (?,?,?)";
     private static final String REMOVE = "DELETE FROM users WHERE id = ?";
 
     public UserDaoJDBCImpl() {
@@ -24,7 +22,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try (Statement stmt = connection.createStatement()) {
 
-            stmt.executeUpdate("CREATE TABLE users " +
+            stmt.execute("CREATE TABLE users " +
                     "(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(50), lastname VARCHAR(50), age INT(3))");
 
             System.out.println("Table created successfully.");
@@ -43,10 +41,11 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String person_name, String lastName, byte age) {
-        try (PreparedStatement stmt = connection.prepareStatement(SAVE)){
+        String save = "INSERT INTO users (name, lastname, age) VALUES (?,?,?)";
+        try (PreparedStatement stmt = connection.prepareStatement(save)){
             stmt.setString(1, person_name);
             stmt.setString(2, lastName);
-            stmt.setInt( 3,age);
+            stmt.setByte( 3,age);
             stmt.executeUpdate();
             System.out.println("User с именем — "+ person_name + " добавлен в базу данных");
         } catch (SQLException e) {
@@ -64,34 +63,54 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+//    public List<User> getAllUsers() {
+//        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users")) {
+//            ResultSet resultSet = stmt.executeQuery("SELECT * FROM users");
+//            List<User> userList = new ArrayList<>();
+//            while (resultSet.next()) {
+//                User user = new User();
+//                user.setId(resultSet.getLong("id"));
+//                user.setAge(resultSet.getByte("age"));
+//                user.setName(resultSet.getString("name"));
+//                user.setLastName(resultSet.getString("lastname"));
+//
+//                userList.add(user);
+//            }
+//            for (User user : userList) {
+//                System.out.println(user);
+//            }
+//            return userList;
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     public List<User> getAllUsers() {
-        try (Statement stmt = connection.createStatement()) {
-
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
-
+        String sql = "SELECT * FROM users ";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery(sql);
             List<User> userList = new ArrayList<>();
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String lastname = rs.getString("lastname");
-                int age = rs.getInt("age");
-
-                User user = new User(id, name, lastname, (byte) age);
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastName"));
+                user.setAge(resultSet.getByte("age"));
                 userList.add(user);
             }
-
-            for (User user : userList) {
-                System.out.println(user);
+            for (User user1 : userList) {
+                System.out.println(user1);
             }
             return userList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException();
         }
+
     }
 
         public void cleanUsersTable() {
         try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("TRUNCATE TABLE users");
+            stmt.execute("DELETE FROM users");
             System.out.println("Table clean.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
