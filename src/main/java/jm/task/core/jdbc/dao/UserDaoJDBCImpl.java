@@ -63,50 +63,28 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-//    public List<User> getAllUsers() {
-//        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users")) {
-//            ResultSet resultSet = stmt.executeQuery("SELECT * FROM users");
-//            List<User> userList = new ArrayList<>();
-//            while (resultSet.next()) {
-//                User user = new User();
-//                user.setId(resultSet.getLong("id"));
-//                user.setAge(resultSet.getByte("age"));
-//                user.setName(resultSet.getString("name"));
-//                user.setLastName(resultSet.getString("lastname"));
-//
-//                userList.add(user);
-//            }
-//            for (User user : userList) {
-//                System.out.println(user);
-//            }
-//            return userList;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public List<User> getAllUsers() {
-        String sql = "SELECT * FROM users ";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = preparedStatement.executeQuery(sql);
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users")) {
+            ResultSet resultSet = stmt.executeQuery("SELECT * FROM users");
             List<User> userList = new ArrayList<>();
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setLastName(resultSet.getString("lastName"));
                 user.setAge(resultSet.getByte("age"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastname"));
+
                 userList.add(user);
             }
-            for (User user1 : userList) {
-                System.out.println(user1);
+            for (User user : userList) {
+                System.out.println(user);
             }
             return userList;
         } catch (SQLException e) {
-            throw new IllegalArgumentException();
+            throw new RuntimeException(e);
         }
-
     }
+
 
         public void cleanUsersTable() {
         try (Statement stmt = connection.createStatement()) {
