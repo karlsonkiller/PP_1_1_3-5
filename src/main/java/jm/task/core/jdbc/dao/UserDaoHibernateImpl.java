@@ -21,9 +21,14 @@ public class UserDaoHibernateImpl implements UserDao {
             session.beginTransaction();
             session.createSQLQuery("CREATE TABLE users " +
                     "(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(50), lastname VARCHAR(50), age INT(3))").executeUpdate();
-            session.getTransaction();
-        } catch (HibernateException ignore) {
-
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            try {
+                sessionFactory.openSession().getTransaction().rollback();
+            } catch (HibernateException e2) {
+                System.out.println(e2.getMessage());
+            }
+            System.out.println(e.getMessage());
         }
     }
 
@@ -32,8 +37,14 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = this.sessionFactory.openSession()) {
             session.beginTransaction();
             session.createSQLQuery("DROP TABLE users").executeUpdate();
-            session.getTransaction();
-        } catch (HibernateException ignore) {
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            try {
+                sessionFactory.openSession().getTransaction().rollback();
+            } catch (HibernateException e2) {
+                System.out.println(e2.getMessage());
+            }
+            System.out.println(e.getMessage());
         }
     }
 
@@ -44,7 +55,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.beginTransaction();
             session.persist(user);
             session.getTransaction().commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             try {
                 sessionFactory.openSession().getTransaction().rollback();
             } catch (HibernateException e2) {
@@ -61,7 +72,7 @@ public class UserDaoHibernateImpl implements UserDao {
             User user = session.load(User.class, id);
             session.delete(user);
             session.getTransaction().commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             try {
                 sessionFactory.openSession().getTransaction().rollback();
             } catch (HibernateException e2) {
@@ -87,7 +98,14 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = this.sessionFactory.openSession()) {
             session.beginTransaction();
             session.createSQLQuery("DELETE FROM users").executeUpdate();
-            session.getTransaction();
-        } catch (Exception ignore) {}
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            try {
+                sessionFactory.openSession().getTransaction().rollback();
+            } catch (HibernateException e2) {
+                System.out.println(e2.getMessage());
+            }
+            System.out.println(e.getMessage());
+        }
     }
 }
